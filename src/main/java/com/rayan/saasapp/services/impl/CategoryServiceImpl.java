@@ -7,6 +7,7 @@ import com.rayan.saasapp.requests.CategoryRequest;
 import com.rayan.saasapp.response.CategoryResponse;
 import com.rayan.saasapp.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -38,14 +40,18 @@ public class CategoryServiceImpl implements CategoryService {
         }
         final Category category = existingCategory.get();
 
-        // Check if the name is already exists.
+        // Check if the name already exists.
         if (!category.getName().equalsIgnoreCase(request.getName())) {
             checkIfCategoryExistsByName(request.getName());
         }
-        final Category updatedCategory = mapper.toEntity(request);
-        updatedCategory.setId(id);
-        System.out.println("########## --> " + updatedCategory.getDeleted());
-        categoryRepository.save(updatedCategory);
+        if (request.getName() != null) {
+            category.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            category.setDescription(request.getDescription());
+        }
+
+        categoryRepository.save(category);
     }
 
     @Override
