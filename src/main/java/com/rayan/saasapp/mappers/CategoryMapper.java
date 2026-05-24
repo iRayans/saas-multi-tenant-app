@@ -11,6 +11,7 @@ public class CategoryMapper {
         return Category.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .deleted(false)
                 .build();
     }
 
