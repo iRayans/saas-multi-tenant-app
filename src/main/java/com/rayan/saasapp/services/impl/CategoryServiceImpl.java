@@ -1,5 +1,6 @@
 package com.rayan.saasapp.services.impl;
 
+import com.rayan.saasapp.common.PageResponse;
 import com.rayan.saasapp.entites.Category;
 import com.rayan.saasapp.mappers.CategoryMapper;
 import com.rayan.saasapp.repositories.CategoryRepository;
@@ -10,9 +11,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -68,11 +70,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponse> findAll() {
-        return this.categoryRepository.findAll()
-                .stream()
-                .map(this.mapper::toResponse)
-                .toList();
+    public PageResponse<CategoryResponse> findAll(final int page, final int size) {
+        final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<Category> categoryPage = this.categoryRepository.findAll(pageRequest);
+        final Page<CategoryResponse> categoryResponsePage = categoryPage.map(category -> mapper.toResponse(category));
+        return PageResponse.of(categoryResponsePage);
     }
 
 

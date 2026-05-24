@@ -1,4 +1,4 @@
-package com.rayan.saasapp.common;
+package com.rayan.saasapp.entites;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

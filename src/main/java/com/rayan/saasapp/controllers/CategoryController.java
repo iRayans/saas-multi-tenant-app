@@ -1,5 +1,6 @@
 package com.rayan.saasapp.controllers;
 
+import com.rayan.saasapp.common.PageResponse;
 import com.rayan.saasapp.requests.CategoryRequest;
 import com.rayan.saasapp.response.CategoryResponse;
 import com.rayan.saasapp.services.CategoryService;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/categories")
@@ -37,8 +36,11 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.ok().body(this.service.findAll());
+    public ResponseEntity<PageResponse<CategoryResponse>> findAllCategories(
+            @RequestParam(name = "page", defaultValue = "0") final int page,
+            @RequestParam(name = "size", defaultValue = "10") final int size
+    ) {
+        return ResponseEntity.ok(this.service.findAll(page, size));
     }
 
     @DeleteMapping("{category-id}")

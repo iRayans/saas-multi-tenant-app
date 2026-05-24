@@ -1,6 +1,5 @@
 package com.rayan.saasapp.entites;
 
-import com.rayan.saasapp.common.AbstractEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
