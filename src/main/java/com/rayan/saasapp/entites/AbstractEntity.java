@@ -35,8 +35,8 @@ public class AbstractEntity {
     @GeneratedValue(strategy = UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
+    //    @Column(name = "tenant_id", nullable = false)
+//    private String tenantId;
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdDate;
@@ -57,8 +57,8 @@ public class AbstractEntity {
         if (this.deleted == null) {
             this.deleted = false;
         }
-        if (this.tenantId == null) {
-            this.tenantId = "default";
-        }
+//        if (this.tenantId == null) {
+//            this.tenantId = "default";
+//        }
     }
 }
