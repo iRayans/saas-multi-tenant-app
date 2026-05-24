@@ -1,6 +1,6 @@
 package com.rayan.saasapp.services;
 
-import java.util.List;
+import com.rayan.saasapp.common.PageResponse;
 
 public interface BasicService<I, O> {
 
@@ -12,5 +12,5 @@ public interface BasicService<I, O> {
 
     O findById(final String id);
 
-    List<O> findAll();
+    PageResponse<O> findAll(int page, int size);
 }
