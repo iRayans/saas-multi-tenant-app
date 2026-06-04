@@ -1,6 +1,6 @@
 package com.rayan.saasapp.requests;
 
-import com.rayan.saasapp.entites.TypeMvt;
+import com.rayan.saasapp.entites.enums.TypeMvt;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.*;

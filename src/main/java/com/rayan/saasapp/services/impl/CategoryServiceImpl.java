@@ -2,6 +2,7 @@ package com.rayan.saasapp.services.impl;
 
 import com.rayan.saasapp.common.PageResponse;
 import com.rayan.saasapp.entites.Category;
+import com.rayan.saasapp.excpetions.DuplicateResourceException;
 import com.rayan.saasapp.mappers.CategoryMapper;
 import com.rayan.saasapp.repositories.CategoryRepository;
 import com.rayan.saasapp.requests.CategoryRequest;
@@ -82,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
         final Optional<Category> category = this.categoryRepository.findByNameIgnoreCase(name);
         if (category.isPresent()) {
             log.debug("Category already exists");
-            throw new RuntimeException("Category already exists");
+            throw new DuplicateResourceException("Category already exists");
         }
     }
 }

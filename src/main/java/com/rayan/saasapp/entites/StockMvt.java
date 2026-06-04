@@ -1,5 +1,6 @@
 package com.rayan.saasapp.entites;
 
+import com.rayan.saasapp.entites.enums.TypeMvt;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -4,6 +4,7 @@ package com.rayan.saasapp.services.impl;
 import com.rayan.saasapp.common.PageResponse;
 import com.rayan.saasapp.entites.Category;
 import com.rayan.saasapp.entites.Product;
+import com.rayan.saasapp.excpetions.DuplicateResourceException;
 import com.rayan.saasapp.mappers.ProductMapper;
 import com.rayan.saasapp.repositories.CategoryRepository;
 import com.rayan.saasapp.repositories.ProductRepository;
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
         final Optional<Product> product = this.productRepository.findByReferenceIgnoreCase(reference);
         if (product.isPresent()) {
             log.debug("Product already exists");
-//            throw new DuplicateResourceException("Product already exists"); // we will use custom exception later
+            throw new DuplicateResourceException("Product already exists");
         }
     }
 

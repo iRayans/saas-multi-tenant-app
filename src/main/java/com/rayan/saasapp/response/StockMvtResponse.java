@@ -1,6 +1,6 @@
 package com.rayan.saasapp.response;
 
-import com.rayan.saasapp.entites.TypeMvt;
+import com.rayan.saasapp.entites.enums.TypeMvt;
 import lombok.*;
 
 import java.time.LocalDate;
