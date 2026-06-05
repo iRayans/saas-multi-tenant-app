@@ -15,6 +15,8 @@ import com.rayan.saasapp.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -95,27 +97,73 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(String id) {
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Deleting user for tenant: {}", tenantId);
 
+        final User user = this.repository.findByIdAndNotDeleted(id)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        // Soft delete
+        user.setDeleted(true);
+        this.repository.save(user);
+        log.info("User deleted successfully");
     }
 
     @Override
     public UserResponse getUserById(String id) {
-        return null;
+        final String tenantId = TenantContext.getCurrentTenant();
+        final User user = this.repository.findByIdAndNotDeleted(id)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+
+        return this.mapper.toResponse(user);
     }
 
     @Override
     public PageResponse<UserResponse> getAllUsers(int page, int size) {
-        return null;
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Retrieving all users for tenant: {}", tenantId);
+        final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<User> users = this.repository.findAllByTenantId(tenantId, pageRequest);
+        final Page<UserResponse> response = users.map(this.mapper::toResponse);
+        return PageResponse.of(response);
     }
 
     @Override
     public void enableUser(String userId) {
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Enabling user for tenant: {}", tenantId);
+        User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+        user.setEnabled(true);
+        this.repository.save(user);
+        log.info("User enabled successfully");
     }
 
     @Override
     public void disableUser(String userId) {
+        final String tenantId = TenantContext.getCurrentTenant();
+        log.info("Disabling user for tenant: {}", tenantId);
+        User user = this.repository.findByIdAndNotDeleted(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
+        if (!user.getTenant().getId().equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+        user.setEnabled(false);
+        this.repository.save(user);
+        log.info("User disabled successfully");
     }
 
     @Override

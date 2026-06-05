@@ -1,6 +1,8 @@
 package com.rayan.saasapp.repositories;
 
 import com.rayan.saasapp.entites.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM USER u WHERE u.id = :id AND u.deleted = false")
     Optional<User> findByIdAndNotDeleted(String id);
+
+    @Query("SELECT u FROM USER u WHERE u.tenant.id = :tenantId AND u.deleted = false")
+    Page<User> findAllByTenantId(String tenantId, PageRequest pageRequest);
 }
