@@ -1,0 +1,39 @@
+package com.rayan.saasapp.auth;
+
+
+import com.rayan.saasapp.auth.requests.LoginRequest;
+import com.rayan.saasapp.auth.response.LoginResponse;
+import com.rayan.saasapp.auth.service.AuthenticationService;
+import com.rayan.saasapp.requests.RegisterTenantRequest;
+import com.rayan.saasapp.services.TenantService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Authentication API")
+public class AuthenticationController {
+
+    private final AuthenticationService authenticationService;
+    private final TenantService tenantService;
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        final LoginResponse loginResponse = authenticationService.login(request);
+        return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterTenantRequest> register(@Valid @RequestBody RegisterTenantRequest request) {
+        this.tenantService.registerTenant(request);
+        return ResponseEntity.ok(request);
+    }
+
+}
