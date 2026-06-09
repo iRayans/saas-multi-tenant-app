@@ -1,17 +1,21 @@
 package com.rayan.saasapp.entites;
 
 import com.rayan.saasapp.entites.enums.TenantStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.GenerationType.UUID;
+
 
 @Getter
 @Setter
@@ -19,8 +23,28 @@ import static jakarta.persistence.EnumType.STRING;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "tenants") // Tenant = A company
-public class Tenant extends AbstractEntity {
+@Table(name = "tenants")
+public class Tenant {
+
+    @Id
+    @GeneratedValue(strategy = UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private String id;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", insertable = false)
+    private LocalDateTime updatedAt;
+
+    @LastModifiedBy
+    @Column(name = "updated_by", insertable = false)
+    private String updatedBy;
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
 
     @Column(name = "company_name", nullable = false)
     private String companyName;

@@ -1,6 +1,7 @@
 package com.rayan.saasapp.security;
 
 import com.rayan.saasapp.config.TenantContext;
+import com.rayan.saasapp.config.TenantSchemaResolver;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtService;
+    private final TenantSchemaResolver tenantSchemaResolver;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (tenantId != null) {
                     TenantContext.setCurrentTenant(tenantId);
-                    final String schemaName = this.tenantSchemaResolver(tenantId);
+                    final String schemaName = this.tenantSchemaResolver.resolveTenantSchema(tenantId);
                     TenantContext.setCurrentSchema(schemaName);
                 }
 

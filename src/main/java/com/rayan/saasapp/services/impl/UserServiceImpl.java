@@ -103,9 +103,8 @@ public class UserServiceImpl implements UserService {
         final User user = this.repository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-        if (!user.getTenant().getId().equals(tenantId)) {
-            throw new InvalidRequestException("User does not belong to the tenant");
-        }
+
+        userTenantId(user.getTenant().getId(), tenantId);
 
         // Soft delete
         user.setDeleted(true);
@@ -113,15 +112,14 @@ public class UserServiceImpl implements UserService {
         log.info("User deleted successfully");
     }
 
+
     @Override
     public UserResponse getUserById(String id) {
         final String tenantId = TenantContext.getCurrentTenant();
         final User user = this.repository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-        if (!user.getTenant().getId().equals(tenantId)) {
-            throw new InvalidRequestException("User does not belong to the tenant");
-        }
+        userTenantId(user.getTenant().getId(), tenantId);
 
         return this.mapper.toResponse(user);
     }
@@ -143,9 +141,8 @@ public class UserServiceImpl implements UserService {
         User user = this.repository.findByIdAndNotDeleted(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-        if (!user.getTenant().getId().equals(tenantId)) {
-            throw new InvalidRequestException("User does not belong to the tenant");
-        }
+        userTenantId(user.getTenant().getId(), tenantId);
+
         user.setEnabled(true);
         this.repository.save(user);
         log.info("User enabled successfully");
@@ -158,9 +155,8 @@ public class UserServiceImpl implements UserService {
         User user = this.repository.findByIdAndNotDeleted(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
 
-        if (!user.getTenant().getId().equals(tenantId)) {
-            throw new InvalidRequestException("User does not belong to the tenant");
-        }
+        userTenantId(user.getTenant().getId(), tenantId);
+
         user.setEnabled(false);
         this.repository.save(user);
         log.info("User disabled successfully");
@@ -171,4 +167,12 @@ public class UserServiceImpl implements UserService {
         return this.repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with: " + username));
     }
+
+
+    private void userTenantId(String userTenantId, String tenantId) {
+        if (!userTenantId.equals(tenantId)) {
+            throw new InvalidRequestException("User does not belong to the tenant");
+        }
+    }
+
 }
