@@ -67,7 +67,7 @@ public class TenantServiceImpl implements TenantService {
             // Create the admin user for given tenant
             createAdminUser(tenant);
         } catch (Exception e) {
-            rollbackTenantStaus(tenant);
+            rollbackTenantStatus(tenant);
         }
     }
 
@@ -136,7 +136,10 @@ public class TenantServiceImpl implements TenantService {
 
 
     // Helper Methods
-    private void rollbackTenantStaus(Tenant tenant) {
+
+    private void rollbackTenantStatus(final Tenant tenant) {
+        tenant.setStatus(TenantStatus.PENDING);
+        this.tenantRepository.save(tenant);
     }
 
     private String extractFirstName(final String adminFullName) {
