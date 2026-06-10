@@ -15,9 +15,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     boolean existsByUsername(String username);
 
-    @Query("SELECT u FROM USER u WHERE u.id = :id AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = false")
     Optional<User> findByIdAndNotDeleted(String id);
 
-    @Query("SELECT u FROM USER u WHERE u.tenant.id = :tenantId AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.tenant.id = :tenantId AND u.deleted = false")
     Page<User> findAllByTenantId(String tenantId, PageRequest pageRequest);
 }

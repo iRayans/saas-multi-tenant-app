@@ -83,4 +83,13 @@ public class StockMvtServiceImpl implements StockMvtService {
             throw new EntityNotFoundException("Product does not exist");
         }
     }
+
+
+    @Override
+    public PageResponse<StockMvtResponse> findAllByProductId(final String productId, final int page, final int size) {
+        final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<StockMvt> stockMvts = this.stockMvtRepository.findAllByProductId(productId, pageRequest);
+        final Page<StockMvtResponse> stockMvtResponses = stockMvts.map(this.mapper::toResponse);
+        return PageResponse.of(stockMvtResponses);
+    }
 }

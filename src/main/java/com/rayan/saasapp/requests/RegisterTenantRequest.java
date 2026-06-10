@@ -9,8 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class RegisterTenantRequest {
-
-
     private String companyName;
     private String companyCode;
     private String email;
