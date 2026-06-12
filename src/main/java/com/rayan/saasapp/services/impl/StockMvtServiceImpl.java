@@ -1,5 +1,6 @@
 package com.rayan.saasapp.services.impl;
 
+
 import com.rayan.saasapp.common.PageResponse;
 import com.rayan.saasapp.entites.Product;
 import com.rayan.saasapp.entites.StockMvt;
@@ -10,45 +11,64 @@ import com.rayan.saasapp.requests.StockMvtRequest;
 import com.rayan.saasapp.response.StockMvtResponse;
 import com.rayan.saasapp.services.StockMvtService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class StockMvtServiceImpl implements StockMvtService {
+
     private final StockMvtRepository stockMvtRepository;
     private final ProductRepository productRepository;
-    private final StockMvtMapper mapper;
+    private final StockMvtMapper stockMvtMapper;
 
     @Override
-    public void create(StockMvtRequest request) {
+    public void create(final StockMvtRequest request) {
+        // check if product exists
         checkIfProductExistsById(request.getProductId());
-        StockMvt stockMvt = mapper.toEntity(request);
-        this.stockMvtRepository.save(stockMvt);
-        log.info("StockMvt created.");
+
+        final StockMvt entity = this.stockMvtMapper.toEntity(request);
+        entity.setDateMvt(LocalDate.now());
+        this.stockMvtRepository.save(entity);
     }
 
     @Override
-    public void update(String id, StockMvtRequest request) {
-        Optional<StockMvt> stockMvt = this.stockMvtRepository.findById(id);
+    public void update(final String id, final StockMvtRequest request) {
+        final Optional<StockMvt> stockMvt = this.stockMvtRepository.findById(id);
         if (stockMvt.isEmpty()) {
-            log.debug("StockMvt not found with id {}", id);
-            throw new RuntimeException("StockMvt not found with id " + id);
+            log.debug("StockMvt does not exist");
+            throw new EntityNotFoundException("StockMvt does not exist");
         }
+
+        // check if product exists
         checkIfProductExistsById(request.getProductId());
 
-        StockMvt upateStockMvt = mapper.toEntity(request);
-        upateStockMvt.setId(id);
-        this.stockMvtRepository.save(upateStockMvt);
-        log.info("StockMvt updated with id {}", upateStockMvt.getId());
+        final StockMvt stockMvtToUpdate = this.stockMvtMapper.toEntity(request);
+        stockMvtToUpdate.setDateMvt(LocalDate.now());
+        stockMvtToUpdate.setId(id);
+        this.stockMvtRepository.save(stockMvtToUpdate);
+    }
+
+    @Override
+    public PageResponse<StockMvtResponse> findAll(final int page, final int size) {
+        final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<StockMvt> stockMvts = this.stockMvtRepository.findAll(pageRequest);
+        final Page<StockMvtResponse> stockMvtResponses = stockMvts.map(this.stockMvtMapper::toResponse);
+        return PageResponse.of(stockMvtResponses);
+    }
+
+    @Override
+    public StockMvtResponse findById(final String id) {
+        return this.stockMvtRepository.findById(id)
+                .map(this.stockMvtMapper::toResponse)
+                .orElseThrow(() -> new EntityNotFoundException("StockMvt does not exist"));
     }
 
     @Override
@@ -59,37 +79,19 @@ public class StockMvtServiceImpl implements StockMvtService {
 
     }
 
-    @Override
-    public StockMvtResponse findById(String id) {
-
-        return this.stockMvtRepository.findById(id)
-                .map(mapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundException("StockMvt not found."));
-    }
-
-    @Override
-    public PageResponse<StockMvtResponse> findAll(final int page, final int size) {
-        final PageRequest pageRequest = PageRequest.of(page, size);
-        final Page<StockMvt> stockMvts = this.stockMvtRepository.findAll(pageRequest);
-        final Page<StockMvtResponse> stockMvtResponses = stockMvts.map(this.mapper::toResponse);
-        return PageResponse.of(stockMvtResponses);
-    }
-
-
-    private void checkIfProductExistsById(String productId) {
-        Optional<Product> product = this.productRepository.findById(productId);
+    private void checkIfProductExistsById(final String productId) {
+        final Optional<Product> product = this.productRepository.findById(productId);
         if (product.isEmpty()) {
             log.debug("Product does not exist");
             throw new EntityNotFoundException("Product does not exist");
         }
     }
 
-
     @Override
     public PageResponse<StockMvtResponse> findAllByProductId(final String productId, final int page, final int size) {
         final PageRequest pageRequest = PageRequest.of(page, size);
         final Page<StockMvt> stockMvts = this.stockMvtRepository.findAllByProductId(productId, pageRequest);
-        final Page<StockMvtResponse> stockMvtResponses = stockMvts.map(this.mapper::toResponse);
+        final Page<StockMvtResponse> stockMvtResponses = stockMvts.map(this.stockMvtMapper::toResponse);
         return PageResponse.of(stockMvtResponses);
     }
 }
