@@ -13,8 +13,8 @@ import java.util.Map;
 public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
     @Override
     public String resolveCurrentTenantIdentifier() {
-        final String schema = TenantContext.getCurrentTenant();
-        log.trace("Current tenant is {}", schema);
+        final String schema = TenantContext.getCurrentSchema();
+        log.debug("Current tenant is {}", schema);
 
         if (schema == null) {
             return "public";
