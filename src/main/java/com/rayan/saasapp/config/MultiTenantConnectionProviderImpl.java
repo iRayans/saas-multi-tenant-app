@@ -30,30 +30,29 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
     }
 
     @Override
-    public Connection getConnection(String tenantIdentifier) throws SQLException {
-        log.debug("Getting connection for tenant: tenantIdentifier={}", tenantIdentifier);
+    public Connection getConnection(final String tenantIdentifier) throws SQLException {
+        log.debug("Getting connection for tenant: {}", tenantIdentifier);
         final Connection connection = getAnyConnection();
-
         try {
-            if (connection != null && !tenantIdentifier.equals("public")) {
-                connection.createStatement().execute("SET search path TO " + tenantIdentifier + ", public");
-                log.trace("Set search_path to {}", tenantIdentifier);
+            if (tenantIdentifier != null && !tenantIdentifier.equals("public")) {
+                connection.createStatement().execute("SET search_path TO " + tenantIdentifier + ", public");
+                log.trace("Set search_path to: {}", tenantIdentifier);
             }
-        } catch (SQLException e) {
-            log.error("Error setting search_path", e);
+        } catch (final SQLException e) {
+            log.error("Error getting connection for tenant: {}", tenantIdentifier, e);
             throw e;
         }
         return connection;
     }
 
     @Override
-    public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
+    public void releaseConnection(final String tenantIdentifier, final Connection connection) throws SQLException {
         try {
             connection.createStatement().execute("SET search_path TO public");
-        } catch (SQLException e) {
-            log.error("Error setting search_path", e);
-            throw e;
+        } catch (final SQLException e) {
+            log.error("Error getting connection for tenant: {}", tenantIdentifier, e);
         }
+        connection.close();
     }
 
     @Override
