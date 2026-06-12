@@ -7,6 +7,7 @@ import com.rayan.saasapp.entites.enums.TenantStatus;
 import com.rayan.saasapp.entites.enums.UserRole;
 import com.rayan.saasapp.excpetions.DuplicateResourceException;
 import com.rayan.saasapp.excpetions.InvalidRequestException;
+import com.rayan.saasapp.excpetions.TenantProvisioningException;
 import com.rayan.saasapp.mappers.TenantMapper;
 import com.rayan.saasapp.repositories.TenantRepository;
 import com.rayan.saasapp.repositories.UserRepository;
@@ -57,6 +58,16 @@ public class TenantServiceImpl implements TenantService {
         // check if the tenant exists
         final Tenant tenant = this.tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("Tenant doesn't exist"));
+
+        if (tenant.getStatus() == TenantStatus.ACTIVE) {
+            throw new InvalidRequestException("Tenant is already active");
+        }
+
+        // Validate before creating the schema
+        if (this.userRepository.existsByUsername(tenant.getAdminUsername())) {
+            throw new DuplicateResourceException("Admin username already exists");
+        }
+
         tenant.setStatus(TenantStatus.ACTIVE);
         this.tenantRepository.save(tenant);
 
@@ -67,7 +78,9 @@ public class TenantServiceImpl implements TenantService {
             // Create the admin user for given tenant
             createAdminUser(tenant);
         } catch (Exception e) {
+            log.error("Provisioning failed", e);
             rollbackTenantStatus(tenant);
+            throw new TenantProvisioningException("Failed to provision tenant");
         }
     }
 
@@ -76,7 +89,7 @@ public class TenantServiceImpl implements TenantService {
         final Tenant tenant = this.tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("Tenant doesn't exist"));
 
-        if (tenant.getStatus() != TenantStatus.PENDING) {
+        if (tenant.getStatus() != TenantStatus.PENDING && tenant.getStatus() != TenantStatus.INACTIVE) {
             throw new InvalidRequestException("Tenant is not in pending status");
         }
         tenant.setStatus(TenantStatus.ACTIVE);
@@ -116,10 +129,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     private void createAdminUser(final Tenant tenant) {
-        // check if user already exist
-        if (this.userRepository.existsByUsername(tenant.getAdminUsername())) {
-            throw new DuplicateResourceException("Email already exists");
-        }
+
         User adminUser = User.builder()
                 .username(tenant.getAdminUsername())
                 .firstName(extractFirstName(tenant.getAdminUsername()))
@@ -129,6 +139,7 @@ public class TenantServiceImpl implements TenantService {
                 .role(UserRole.ROLE_COMPANY_ADMIN)
                 .tenant(tenant)
                 .deleted(false)
+                .enabled(true)
                 .build();
         userRepository.save(adminUser);
         log.info("Admin user created successfully : {}", adminUser.getFirstName());
@@ -138,6 +149,7 @@ public class TenantServiceImpl implements TenantService {
     // Helper Methods
 
     private void rollbackTenantStatus(final Tenant tenant) {
+        log.error("Tenant provisioning failed, rolling back status");
         tenant.setStatus(TenantStatus.PENDING);
         this.tenantRepository.save(tenant);
     }
