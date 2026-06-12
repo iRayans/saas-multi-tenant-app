@@ -33,6 +33,7 @@ public class TenantMapper {
                 .email(entity.getEmail())
                 .adminFullName(entity.getAdminFullName())
                 .adminEmail(entity.getAdminEmail())
+                .adminUsername(entity.getAdminUsername())
                 .status(entity.getStatus())
                 .createTime(entity.getCreatedAt())
                 .build();
