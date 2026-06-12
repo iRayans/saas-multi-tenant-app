@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 public class Category extends AbstractEntity {
 
     @Column(name = "name", nullable = false)

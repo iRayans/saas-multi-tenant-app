@@ -82,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
     private void checkIfCategoryExistsByName(final String name) {
         final Optional<Category> category = this.categoryRepository.findByNameIgnoreCase(name);
         if (category.isPresent()) {
-            log.debug("Category already exists");
+            log.debug("Category already exists, {}", name);
             throw new DuplicateResourceException("Category already exists");
         }
     }
