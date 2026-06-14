@@ -19,6 +19,7 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
 
     private final DataSource dataSource;
 
+    // Grabs any Connection from the pool with no schema switching.
     @Override
     public Connection getAnyConnection() throws SQLException {
         return this.dataSource.getConnection();
@@ -32,9 +33,11 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
     @Override
     public Connection getConnection(final String tenantIdentifier) throws SQLException {
         log.debug("Getting connection for tenant: {}", tenantIdentifier);
+        // get a connection from the pool.
         final Connection connection = getAnyConnection();
         try {
             if (tenantIdentifier != null && !tenantIdentifier.equals("public")) {
+                // set search_path to tenant schema.
                 connection.createStatement().execute("SET search_path TO " + tenantIdentifier + ", public");
                 log.trace("Set search_path to: {}", tenantIdentifier);
             }
@@ -48,6 +51,7 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
     @Override
     public void releaseConnection(final String tenantIdentifier, final Connection connection) throws SQLException {
         try {
+            // set search_path to public before returning the connection back to the CP.
             connection.createStatement().execute("SET search_path TO public");
         } catch (final SQLException e) {
             log.error("Error getting connection for tenant: {}", tenantIdentifier, e);

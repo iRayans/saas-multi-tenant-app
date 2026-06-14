@@ -13,7 +13,13 @@ public class TenantSchemaResolver {
     private final JdbcTemplate jdbcTemplate;
     private static final String PUBLIC_SCHEMA = "public";
 
-    @Cacheable(value = "tenantSchema", key = "#tenantId")
+
+    /**
+     * Resolves and caches the schema name for the given tenant ID.
+     * Cached by tenantId to avoid repeated DB lookups on every request.
+     * Returns "public" if the tenant is not found or an error occurs.
+     */
+    @Cacheable(value = "tenantSchema", key = "#tenantId", condition = "#result != 'public'")
     public String resolveTenantSchema(final String tenantId) {
         if (tenantId == null) {
             return PUBLIC_SCHEMA;
@@ -25,7 +31,7 @@ public class TenantSchemaResolver {
 
             if (companyCode != null) {
                 final String schemaName = "tenant_" + companyCode.toLowerCase();
-                log.debug("Tenant Schema resolved: {} for teanant {} ", schemaName, tenantId);
+                log.debug("Tenant Schema resolved: {} for tenant {} ", schemaName, tenantId);
                 return schemaName;
             }
             log.warn("Tenant Schema not found: {}, using public schema ", tenantId);

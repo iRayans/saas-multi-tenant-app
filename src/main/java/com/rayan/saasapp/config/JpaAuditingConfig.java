@@ -9,6 +9,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+/**
+ * Provides the current authenticated user to Spring Data JPA auditing,
+ * automatically populating @CreatedBy and @LastModifiedBy entity fields on save.
+ */
 @Configuration
 public class JpaAuditingConfig {
 

@@ -1,5 +1,11 @@
 package com.rayan.saasapp.config;
 
+
+/**
+ * Thread-scoped holder for the current request's tenant and schema identifiers.
+ * Populated by the JWT filter and read by Hibernate to route queries
+ * to the correct tenant schema.
+ */
 public class TenantContext {
     private static final ThreadLocal<String> CURRENT_TENANT = new ThreadLocal<>();
     private static final ThreadLocal<String> CURRENT_SCHEMA = new ThreadLocal<>();
