@@ -6,6 +6,7 @@ implement two different multi-tenancy strategies from scratch.
 ## Architecture
 
 The application is deployed on AWS using:
+![Architecture Diagram](/architecture.png)
 
 - **ECS Fargate** — runs the Spring Boot containers
 - **Application Load Balancer** — distributes traffic across tasks
