@@ -85,7 +85,7 @@ After apply completes, push your Docker image:
 
 ```bash
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 
-docker buildx build --platform linux/amd64 -t /saas-app:latest --push .
+docker build -t /saas-app:latest --push .
 ```
 
 ECS will pick up the image automatically.
