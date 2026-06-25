@@ -104,5 +104,5 @@ terraform destroy
 
 ## Project Status
 
-This project is a learning portfolio piece built by following the "Alibou" SaaS multi-tenancy tutorial, then extending
+This project is a learning portfolio piece built by following the "[Alibou](https://www.youtube.com/watch?v=utSW4EeoguY&list=LL&index=17&t=12462s)" SaaS multi-tenancy tutorial, then extending
 it with full AWS deployment and Terraform automation.
