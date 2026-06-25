@@ -3,6 +3,18 @@
 A learning project built to explore multi-tenancy concepts in a Spring Boot application. The goal was to understand and
 implement two different multi-tenancy strategies from scratch.
 
+## Architecture
+
+The application is deployed on AWS using:
+
+- **ECS Fargate** — runs the Spring Boot containers
+- **Application Load Balancer** — distributes traffic across tasks
+- **RDS PostgreSQL** — multi-tenant database (schema-per-tenant)
+- **ElastiCache Redis** — caching layer for tenant schema lookups
+- **ECR** — Docker image registry
+- **VPC** with public/private subnets across 2 AZs
+- **NAT Gateway** — allows private subnets to reach the internet (for ECR pulls)
+
 ## What I Learned
 
 ### Approach 1 — Shared Schema (Single Database)
@@ -57,3 +69,39 @@ Each tenant gets their own isolated PostgreSQL schema. When a new tenant is onbo
 ```
 
 The app runs on `http://localhost:8080`. Swagger UI is available at `http://localhost:8080/swagger-ui.html`.
+
+## Deploying to AWS
+
+The full infrastructure is defined in Terraform under `terraform/`.
+
+```bash
+cd terraform
+terraform init
+terraform apply
+```
+
+After apply completes, push your Docker image:
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 
+docker buildx build --platform linux/amd64 -t /saas-app:latest --push .
+```
+
+ECS will pick up the image automatically.
+
+Get the ALB URL:
+
+```bash
+terraform output alb_dns_name
+```
+
+To tear everything down:
+
+```bash
+terraform destroy
+```
+
+## Project Status
+
+This project is a learning portfolio piece built by following the "Alibou" SaaS multi-tenancy tutorial, then extending
+it with full AWS deployment and Terraform automation.
