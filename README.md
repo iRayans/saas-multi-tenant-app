@@ -85,7 +85,7 @@ After apply completes, push your Docker image:
 
 ```bash
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 
-docker buildx build --platform linux/amd64 -t /saas-app:latest --push .
+docker build -t /saas-app:latest --push .
 ```
 
 ECS will pick up the image automatically.
@@ -104,5 +104,5 @@ terraform destroy
 
 ## Project Status
 
-This project is a learning portfolio piece built by following the "Alibou" SaaS multi-tenancy tutorial, then extending
+This project is a learning portfolio piece built by following the "[Alibou](https://www.youtube.com/watch?v=utSW4EeoguY&list=LL&index=17&t=12462s)" SaaS multi-tenancy tutorial, then extending
 it with full AWS deployment and Terraform automation.
