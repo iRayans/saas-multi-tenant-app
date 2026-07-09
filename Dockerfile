@@ -10,4 +10,5 @@ COPY --from=build /app/target/saas-multi-tenant-app-0.0.1-SNAPSHOT.jar app.jar
 COPY --from=build /app/target/classes/certs/ certs/
 EXPOSE 8080
 LABEL authors="rayan"
+USER 1001
 CMD ["java", "-jar", "app.jar"]
